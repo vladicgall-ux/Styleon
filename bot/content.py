@@ -12,7 +12,7 @@ SCHOOL_NAME = "STYLE ON"
 CITY = "Челябинск"
 VK_COMMUNITY = "https://vk.ru/style_on1"
 VK_MESSAGE = "https://vk.me/style_on1"
-WEBSITE = "https://xn--b1amagfc4bi6b3cp.xn--p1ai/personalnyj-stilist"
+WEBSITE = "https://включистиль.рф/"
 COURSE_START_DATE = "7 октября 2026"
 LEGAL_ENTITY = "ИП Галлямова Юлия Сабирьяновна"
 
