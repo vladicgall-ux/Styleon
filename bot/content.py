@@ -16,6 +16,10 @@ WEBSITE = "https://включистиль.рф/"
 COURSE_START_DATE = "7 октября 2026"
 LEGAL_ENTITY = "ИП Галлямова Юлия Сабирьяновна"
 
+SELLER_NAME = "Галлямова Юлия Сабирьяновна"
+SELLER_PHONE = "+7 (993) 517-82-74"
+SELLER_BANK = "Сбербанк"
+
 WELCOME_PHOTO = MEDIA_DIR / "teacher-julia-1.jpg"
 WELCOME_TEXT = (
     "Привет, модница) 🤍\n"

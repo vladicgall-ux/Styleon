@@ -66,6 +66,7 @@ def pricing_menu(active: str):
         label = f"• {title} •" if key == active else title
         row.append(InlineKeyboardButton(text=label, callback_data=f"pricing:{key}"))
     kb.row(*row)
+    kb.row(InlineKeyboardButton(text=f"💳 Купить «{content.TARIFFS[active]['title']}»", callback_data=f"buy:{active}"))
     kb.row(InlineKeyboardButton(text="📝 Оставить заявку", callback_data="apply"))
     kb.row(InlineKeyboardButton(text="⬅ В главное меню", callback_data="menu"))
     return kb.as_markup()
