@@ -1,22 +1,28 @@
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, FSInputFile
+from aiogram.types import CallbackQuery
 
-from .. import content, keyboards
+from .. import content, content_store, keyboards
+from ..config import is_admin
 
 router = Router()
 
 
 @router.callback_query(F.data == "menu")
 async def show_menu(callback: CallbackQuery):
-    await callback.message.answer("Выбирай нужный раздел 👇", reply_markup=keyboards.main_menu())
+    await callback.message.answer(
+        "Выбирай нужный раздел 👇",
+        reply_markup=keyboards.main_menu(is_admin=is_admin(callback.from_user.id)),
+    )
     await callback.answer()
 
 
 @router.callback_query(F.data == "course")
 async def show_course(callback: CallbackQuery):
+    text = await content_store.get_text("course", content.COURSE_TEXT)
+    photo = await content_store.get_photo("course", content.COURSE_PHOTO)
     await callback.message.answer_photo(
-        photo=FSInputFile(content.COURSE_PHOTO),
-        caption=content.COURSE_TEXT,
+        photo=content_store.to_input(photo),
+        caption=text,
         reply_markup=keyboards.course_menu(),
     )
     await callback.answer()
@@ -24,9 +30,11 @@ async def show_course(callback: CallbackQuery):
 
 @router.callback_query(F.data == "format")
 async def show_format(callback: CallbackQuery):
+    text = await content_store.get_text("format", content.FORMAT_TEXT)
+    photo = await content_store.get_photo("format", content.FORMAT_PHOTO)
     await callback.message.answer_photo(
-        photo=FSInputFile(content.FORMAT_PHOTO),
-        caption=content.FORMAT_TEXT,
+        photo=content_store.to_input(photo),
+        caption=text,
         reply_markup=keyboards.back_to_menu(),
     )
     await callback.answer()
@@ -34,7 +42,8 @@ async def show_format(callback: CallbackQuery):
 
 @router.callback_query(F.data == "program")
 async def show_program(callback: CallbackQuery):
-    await callback.message.answer(content.PROGRAM_INTRO, reply_markup=keyboards.program_menu())
+    text = await content_store.get_text("program_intro", content.PROGRAM_INTRO)
+    await callback.message.answer(text, reply_markup=keyboards.program_menu())
     await callback.answer()
 
 
@@ -62,10 +71,10 @@ async def show_tariff(callback: CallbackQuery):
 
 async def send_tariff(callback: CallbackQuery, key: str):
     tariff = content.TARIFFS[key]
-    lines = [f"💳 <b>{tariff['title']} — {tariff['price']}</b>\n", tariff["note"], ""]
-    for feature in tariff["features"]:
-        lines.append(f"— {feature}")
-    await callback.message.answer("\n".join(lines), reply_markup=keyboards.pricing_menu(key))
+    default_body = "\n".join([tariff["note"], ""] + [f"— {f}" for f in tariff["features"]])
+    body = await content_store.get_text(f"tariff_{key}", default_body)
+    text = f"💳 <b>{tariff['title']} — {tariff['price']}</b>\n\n{body}"
+    await callback.message.answer(text, reply_markup=keyboards.pricing_menu(key))
     await callback.answer()
 
 
@@ -82,9 +91,12 @@ async def show_teachers(callback: CallbackQuery):
 async def show_teacher_card(callback: CallbackQuery):
     key = callback.data.split(":", 1)[1]
     teacher = content.TEACHERS[key]
-    caption = f"<b>{teacher['name']}</b>\n<i>{teacher['role']}</i>\n\n{teacher['text']}"
+    default_caption = f"<b>{teacher['name']}</b>\n<i>{teacher['role']}</i>\n\n{teacher['text']}"
+    store_key = f"teacher_{key}"
+    caption = await content_store.get_text(store_key, default_caption)
+    photo = await content_store.get_photo(store_key, teacher["photo"])
     await callback.message.answer_photo(
-        photo=FSInputFile(teacher["photo"]),
+        photo=content_store.to_input(photo),
         caption=caption,
         reply_markup=keyboards.teacher_card_menu(),
     )
@@ -93,9 +105,11 @@ async def show_teacher_card(callback: CallbackQuery):
 
 @router.callback_query(F.data == "about")
 async def show_about(callback: CallbackQuery):
+    text = await content_store.get_text("about", content.ABOUT_TEXT)
+    photo = await content_store.get_photo("about", content.ABOUT_PHOTO)
     await callback.message.answer_photo(
-        photo=FSInputFile(content.ABOUT_PHOTO),
-        caption=content.ABOUT_TEXT,
+        photo=content_store.to_input(photo),
+        caption=text,
         reply_markup=keyboards.back_to_menu(),
     )
     await callback.answer()
@@ -103,5 +117,6 @@ async def show_about(callback: CallbackQuery):
 
 @router.callback_query(F.data == "reviews")
 async def show_reviews(callback: CallbackQuery):
-    await callback.message.answer(content.REVIEWS_TEXT, reply_markup=keyboards.back_to_menu())
+    text = await content_store.get_text("reviews", content.REVIEWS_TEXT)
+    await callback.message.answer(text, reply_markup=keyboards.back_to_menu())
     await callback.answer()

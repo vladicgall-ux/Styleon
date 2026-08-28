@@ -5,7 +5,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery, Message
 
 from .. import content, keyboards
-from ..config import ADMIN_CHAT_ID
+from ..config import ADMIN_CHAT_ID, is_admin
 
 router = Router()
 
@@ -42,7 +42,9 @@ async def start_apply_form(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "apply:cancel")
 async def cancel_apply_form(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.answer("Заявка отменена.", reply_markup=keyboards.main_menu())
+    await callback.message.answer(
+        "Заявка отменена.", reply_markup=keyboards.main_menu(is_admin=is_admin(callback.from_user.id))
+    )
     await callback.answer()
 
 
@@ -88,6 +90,6 @@ async def apply_got_tariff(callback: CallbackQuery, state: FSMContext):
 
     await callback.message.answer(
         "Спасибо! Заявка принята 🤍 Мы свяжемся с вами в ближайшее время.",
-        reply_markup=keyboards.main_menu(),
+        reply_markup=keyboards.main_menu(is_admin=is_admin(user.id)),
     )
     await callback.answer()

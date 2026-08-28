@@ -1,7 +1,7 @@
 from aiogram import F, Router
 from aiogram.types import CallbackQuery
 
-from .. import content, keyboards
+from .. import content, content_store, keyboards
 
 router = Router()
 
@@ -18,7 +18,8 @@ async def show_faq(callback: CallbackQuery):
 @router.callback_query(F.data.startswith("faq:"))
 async def show_faq_answer(callback: CallbackQuery):
     index = int(callback.data.split(":", 1)[1])
-    question, answer = content.FAQ[index]
+    question, default_answer = content.FAQ[index]
+    answer = await content_store.get_text(f"faq_{index}", default_answer)
     await callback.message.answer(
         f"<b>{question}</b>\n\n{answer}",
         reply_markup=keyboards.faq_answer_menu(),

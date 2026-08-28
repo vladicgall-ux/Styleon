@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from .. import content, storage
-from ..config import ADMIN_CHAT_ID
+from ..config import is_admin
 
 router = Router()
 
@@ -22,13 +22,9 @@ class AdminLink(StatesGroup):
     link = State()
 
 
-def _is_admin(user_id: int) -> bool:
-    return bool(ADMIN_CHAT_ID) and str(user_id) == str(ADMIN_CHAT_ID)
-
-
 @router.callback_query(F.data.startswith("admin_confirm:"))
 async def admin_confirm(callback: CallbackQuery, state: FSMContext):
-    if not _is_admin(callback.from_user.id):
+    if not is_admin(callback.from_user.id):
         await callback.answer("Недоступно", show_alert=True)
         return
 
@@ -49,7 +45,7 @@ async def admin_confirm(callback: CallbackQuery, state: FSMContext):
 
 @router.message(AdminLink.link)
 async def admin_got_link(message: Message, state: FSMContext):
-    if not _is_admin(message.from_user.id):
+    if not is_admin(message.from_user.id):
         return
     await state.update_data(link=message.text)
     kb = InlineKeyboardBuilder()
@@ -59,7 +55,7 @@ async def admin_got_link(message: Message, state: FSMContext):
 
 @router.callback_query(AdminLink.link, F.data == "admin_send_link")
 async def admin_send_link(callback: CallbackQuery, state: FSMContext):
-    if not _is_admin(callback.from_user.id):
+    if not is_admin(callback.from_user.id):
         await callback.answer("Недоступно", show_alert=True)
         return
 
@@ -83,7 +79,7 @@ async def admin_send_link(callback: CallbackQuery, state: FSMContext):
 
 @router.message(Command("stats"))
 async def stats(message: Message):
-    if not _is_admin(message.from_user.id):
+    if not is_admin(message.from_user.id):
         return
 
     orders = await storage.list_orders()

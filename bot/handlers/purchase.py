@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardButton, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from .. import content, keyboards, storage
-from ..config import ADMIN_CHAT_ID
+from ..config import ADMIN_CHAT_ID, is_admin
 
 router = Router()
 
@@ -116,6 +116,6 @@ async def submit_order(callback: CallbackQuery, state: FSMContext):
 
     await callback.message.answer(
         "Спасибо! Заявка на оплату отправлена. Мы проверим чек и пришлём ссылку на канал курса в ближайшее время 🤍",
-        reply_markup=keyboards.main_menu(),
+        reply_markup=keyboards.main_menu(is_admin=is_admin(callback.from_user.id)),
     )
     await callback.answer()

@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from . import content
 
 
-def main_menu() -> InlineKeyboardBuilder:
+def main_menu(is_admin: bool = False) -> InlineKeyboardBuilder:
     kb = InlineKeyboardBuilder()
     kb.button(text="🎓 О курсе «Персональный стилист»", callback_data="course")
     kb.button(text="🧵 Формат обучения", callback_data="format")
@@ -15,6 +15,8 @@ def main_menu() -> InlineKeyboardBuilder:
     kb.button(text="💬 Отзывы выпускниц", callback_data="reviews")
     kb.button(text="❓ Частые вопросы", callback_data="faq")
     kb.button(text="📝 Оставить заявку", callback_data="apply")
+    if is_admin:
+        kb.button(text="⚙️ Настройки контента", callback_data="settings")
     kb.row(
         InlineKeyboardButton(text="🔗 Мы в VK", url=content.VK_COMMUNITY),
         InlineKeyboardButton(text="🌐 Сайт школы", url=content.WEBSITE),
